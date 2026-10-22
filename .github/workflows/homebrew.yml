@@ -1,0 +1,54 @@
+name: Homebrew
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Published stable tag (leave empty for latest)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: homebrew-tap
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'MiracleXYZ/AeroTab' && (github.event_name == 'workflow_dispatch' || !github.event.release.prerelease)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          repository: MiracleXYZ/homebrew-tap
+          ref: main
+          path: homebrew-tap
+          ssh-key: ${{ secrets.HOMEBREW_TAP_DEPLOY_KEY }}
+      - name: Verify release and update cask
+        id: cask
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: python3 scripts/update-homebrew.py --tap homebrew-tap --tag "$RELEASE_TAG"
+      - name: Push tap update
+        working-directory: homebrew-tap
+        env:
+          VERSION: ${{ steps.cask.outputs.version }}
+        run: |
+          git add Casks/aerotab.rb
+          if git diff --cached --quiet; then
+            echo "Tap is already up to date."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Update AeroTab to $VERSION"
+          git push origin HEAD:main

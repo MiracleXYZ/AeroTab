@@ -22,7 +22,7 @@
 
 ## 为什么使用 AeroTab？
 
-AeroTab 将 Alt-Tab 式的预览带到**整个 AeroSpace 工作区**。按下 **⌥ Tab** 后即可松手，先看清每个工作区里有哪些窗口，再决定去哪里。
+AeroTab 将 Alt-Tab 式的预览带到 **整个 AeroSpace 工作区** 。按下 **⌥ Tab** 后即可松手，先看清每个工作区里有哪些窗口，再决定去哪里。
 
 - **小桌面预览**：保留窗口的相对位置、尺寸和叠放关系。
 - **每个窗口一个图标**：遮挡或无法截图都不会漏掉；两个 Finder 窗口就显示两个 Finder 图标。
@@ -34,6 +34,25 @@ AeroTab 将 Alt-Tab 式的预览带到**整个 AeroSpace 工作区**。按下 **
 ## 安装
 
 需要 **macOS 26+**，以及已启动的 **[AeroSpace](https://github.com/nikitabobko/AeroSpace) 0.21.3-Beta 或更新版本**。
+
+### Homebrew（推荐）
+
+```sh
+brew install --cask miraclexyz/tap/aerotab
+```
+
+打开 AeroTab，按引导开启 **辅助功能** 权限；如需窗口内容预览，再开启 **屏幕录制** 权限。随后按 **⌥ Tab** 开始使用。
+
+**更新：** 先退出 AeroTab，运行下面的命令，再重新打开应用：
+
+```sh
+brew update
+brew upgrade --cask miraclexyz/tap/aerotab
+```
+
+如果之前通过 ZIP 安装，请先退出 AeroTab，将 Applications 中的旧 AeroTab.app 移到废纸篓，再运行安装命令；设置会保留。
+
+### 手动下载安装
 
 1. 从 **[GitHub Releases](https://github.com/MiracleXYZ/AeroTab/releases/latest)** 下载对应安装包：Apple 芯片选择 `arm64.zip`，Intel Mac 选择 `x86_64.zip`。
 2. 解压，将 **AeroTab.app** 拖到 **Applications（应用程序）**，然后打开。
@@ -50,7 +69,7 @@ xattr -dr com.apple.quarantine "/Applications/AeroTab.app"
 
 然后重新打开 AeroTab。
 
-**更新：**退出 AeroTab，用新版替换 Applications 中的应用，再重新打开。设置会保留；如 macOS 要求，请重新授权。
+**更新：** 退出 AeroTab，用新版替换 Applications 中的应用，再重新打开。设置会保留；如 macOS 要求，请重新授权。
 
 ## 使用方式
 
@@ -72,7 +91,7 @@ xattr -dr com.apple.quarantine "/Applications/AeroTab.app"
 
 ### 看懂布局标记
 
-每张预览**内部左下角的图标代表窗口**，按照已记录的布局排列。卡片下方的应用快捷键列表则按应用合并，方便快速进入应用。
+每张预览 **内部左下角的图标代表窗口** ，按照已记录的布局排列。卡片下方的应用快捷键列表则按应用合并，方便快速进入应用。
 
 | 标记 | 含义 |
 | --- | --- |
@@ -114,6 +133,7 @@ AeroTab 在工作区可见时记录窗口位置。尚未访问过的工作区显
 需要 **Swift 6** 和包含 **macOS 26 SDK** 的 Command Line Tools 或 Xcode。无第三方 Swift 包依赖。
 
 ```sh
+python3 -m unittest discover -s scripts/tests
 python3 scripts/check-localizations.py  # 检查翻译 key 与格式参数
 ./scripts/test.sh          # 运行核心测试
 ./scripts/build.sh         # 构建 build/AeroTab.app
@@ -122,9 +142,11 @@ python3 scripts/check-localizations.py  # 检查翻译 key 与格式参数
 
 `AeroTabCore` 负责 CLI、配置、布局和按键路由；`AeroTab` 负责原生界面、窗口捕获与全局键盘处理。英文为源语言；新增文案时同步更新 `Resources/en.lproj/Localizable.strings` 与 `Resources/zh-Hans.lproj/Localizable.strings`，保持 key 和格式参数一致。
 
-**界面检查：**运行 `python3 scripts/audit-preview.py build/AeroTab.app/Contents/MacOS/AeroTab`，使用虚构数据离屏渲染，并检查测试进程是否影响工作区和焦点。临时产物默认自动清理；`build/` 只保留安装包。README 演示图保存在 `assets/demo/`。
+**界面检查：** 运行 `python3 scripts/audit-preview.py build/AeroTab.app/Contents/MacOS/AeroTab`，使用虚构数据离屏渲染，并检查测试进程是否影响工作区和焦点。临时产物默认自动清理；`build/` 只保留安装包。README 演示图保存在 `assets/demo/`。
 
-**发布版本：**更新 `Resources/Info.plist` 的版本号、构建号及两份 README 的版本徽章，提交后推送对应的 `vX.Y.Z` 标签。Release workflow 会在 Apple Silicon 与 Intel runner 上分别测试、构建并打包，创建带有两个 ZIP 和 SHA-256 校验文件的 **GitHub Release 草稿**。检查产物、填写版本说明后，在 Releases 页面发布。
+**发布版本：** 更新 `Resources/Info.plist` 的版本号、构建号及两份 README 的版本徽章，提交后推送对应的 `vX.Y.Z` 标签。Release workflow 会在 Apple Silicon 与 Intel runner 上分别测试、构建并打包，创建带有两个 ZIP 和 SHA-256 校验文件的 **GitHub Release 草稿**。检查产物、填写版本说明后，在 Releases 页面发布。正式版发布后，Homebrew workflow 会校验两个 ZIP 并自动更新 [Homebrew tap](https://github.com/MiracleXYZ/homebrew-tap)；草稿和预发布版不会同步。需要重试时，可在 Actions → Homebrew → Run workflow 中指定已发布标签，留空则使用最新正式版。
+
+自动同步使用仓库 Secret `HOMEBREW_TAP_DEPLOY_KEY`，对应仅能写入 tap 仓库的 SSH deploy key。Cask 模板在 `scripts/aerotab.rb.template`；同步脚本为 `scripts/update-homebrew.py`。
 
 默认构建使用 ad-hoc 签名。如需使用本机证书，可设置 `CODESIGN_IDENTITY` 环境变量；Developer ID 公证需另行配置。
 

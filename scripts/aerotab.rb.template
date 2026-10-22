@@ -1,0 +1,32 @@
+cask "aerotab" do
+  arch arm: "arm64", intel: "x86_64"
+
+  version "$version"
+  sha256 arm:   "$arm64_sha256",
+         intel: "$x86_64_sha256"
+
+  url "https://github.com/MiracleXYZ/AeroTab/releases/download/v#{version}/AeroTab-#{version}-#{arch}.zip"
+  name "AeroTab"
+  desc "Workspace switcher for AeroSpace with window previews"
+  homepage "https://github.com/MiracleXYZ/AeroTab"
+
+  livecheck do
+    url :url
+    strategy :github_latest
+  end
+
+  depends_on macos: ">= $minimum_macos"
+
+  app "AeroTab.app"
+
+  postflight_steps do
+    run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{appdir}}/AeroTab.app"], must_succeed: false
+  end
+
+  uninstall quit: "dev.miraclexyz.AeroTab"
+
+  zap trash: [
+    "~/Library/Application Support/AeroTab",
+    "~/Library/Preferences/dev.miraclexyz.AeroTab.plist",
+  ]
+end

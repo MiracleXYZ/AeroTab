@@ -16,5 +16,6 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 scripts/check-localizations.py
+      - run: python3 -m unittest discover -s scripts/tests
       - run: ./scripts/test.sh
       - run: ./scripts/build.sh

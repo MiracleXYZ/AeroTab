@@ -35,6 +35,25 @@ AeroTab brings an Alt-Tab-style overview to **whole AeroSpace workspaces**. Pres
 
 Requires **macOS 26+** and **[AeroSpace](https://github.com/nikitabobko/AeroSpace) 0.21.3-Beta or later**, running on your Mac.
 
+### Homebrew (recommended)
+
+```sh
+brew install --cask miraclexyz/tap/aerotab
+```
+
+Open AeroTab and follow the setup guide to enable **Accessibility**, plus **Screen Recording** for window-content previews. Then press **⌥ Tab**.
+
+**Updating:** quit AeroTab, run the following commands, then reopen it:
+
+```sh
+brew update
+brew upgrade --cask miraclexyz/tap/aerotab
+```
+
+If you previously installed the ZIP, quit AeroTab and move the old AeroTab.app from Applications to Trash before running the install command. Your settings are preserved.
+
+### Manual download
+
 1. Download from **[GitHub Releases](https://github.com/MiracleXYZ/AeroTab/releases/latest)**: choose `arm64.zip` for Apple Silicon or `x86_64.zip` for Intel.
 2. Unzip and drag **AeroTab.app** into **Applications**, then open it.
 3. Follow the setup guide to enable **Accessibility**. Enable **Screen Recording** too if you want window-content previews.
@@ -114,6 +133,7 @@ Previews stay in local memory and are cleared when the switcher closes. Normal u
 Requires **Swift 6** and Command Line Tools or Xcode with the **macOS 26 SDK**. There are no third-party Swift package dependencies.
 
 ```sh
+python3 -m unittest discover -s scripts/tests
 python3 scripts/check-localizations.py  # Check translation keys and arguments
 ./scripts/test.sh          # Run core tests
 ./scripts/build.sh         # Build build/AeroTab.app
@@ -124,7 +144,9 @@ python3 scripts/check-localizations.py  # Check translation keys and arguments
 
 **Visual checks:** run `python3 scripts/audit-preview.py build/AeroTab.app/Contents/MacOS/AeroTab` to render fictional fixtures offscreen and check the test process’s effect on workspaces and focus. Temporary outputs are cleaned automatically; keep `build/` for installable packages. Curated README demos live in `assets/demo/`.
 
-**Releases:** update the version and build number in `Resources/Info.plist` and the version badges in both READMEs, commit, then push the matching `vX.Y.Z` tag. The release workflow tests, builds, and packages on Apple Silicon and Intel runners, then creates a **draft GitHub Release** with both ZIPs and SHA-256 checksums. Inspect the assets, write the release notes, and publish from the Releases page.
+**Releases:** update the version and build number in `Resources/Info.plist` and the version badges in both READMEs, commit, then push the matching `vX.Y.Z` tag. The release workflow tests, builds, and packages on Apple Silicon and Intel runners, then creates a **draft GitHub Release** with both ZIPs and SHA-256 checksums. Inspect the assets, write the release notes, and publish from the Releases page. Publishing a stable release triggers the Homebrew workflow, which verifies both ZIPs and updates the [Homebrew tap](https://github.com/MiracleXYZ/homebrew-tap). Drafts and prereleases are excluded. To retry, use **Actions → Homebrew → Run workflow** with a published tag, or leave it blank for the latest stable release.
+
+Sync uses the repository secret `HOMEBREW_TAP_DEPLOY_KEY`, an SSH deploy key with write access only to the tap repository. The cask template is `scripts/aerotab.rb.template`; the sync script is `scripts/update-homebrew.py`.
 
 Builds use ad-hoc signing by default. Set `CODESIGN_IDENTITY` to use a local signing certificate; Developer ID notarization requires separate setup.
 

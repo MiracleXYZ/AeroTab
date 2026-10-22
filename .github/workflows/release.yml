@@ -68,13 +68,21 @@ jobs:
 
           Requires macOS 26+ and AeroSpace 0.21.3-Beta or later.
 
+          Install with Homebrew / 使用 Homebrew 安装:
+
+          ```sh
+          brew install --cask miraclexyz/tap/aerotab
+          ```
+
+          Manual download / 手动下载:
+
           - **Apple Silicon / Apple 芯片:** download the `arm64.zip`.
           - **Intel:** download the `x86_64.zip`.
 
           Unzip, drag AeroTab.app into Applications, and follow the setup guide.
           解压后将 AeroTab.app 拖入应用程序，按引导完成授权，即可使用 ⌥Tab。
 
-          Builds are ad-hoc signed and not notarized. / 安装包使用 ad-hoc 签名，尚未公证。
+          [Installation guide](https://github.com/MiracleXYZ/AeroTab#install) · [安装说明](https://github.com/MiracleXYZ/AeroTab/blob/main/README.zh-CN.md#安装)
           NOTES
           gh release create "$TAG" AeroTab-*.zip SHA256SUMS.txt \
             --verify-tag --draft --title "AeroTab $TAG" \
