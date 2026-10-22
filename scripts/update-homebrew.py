@@ -15,6 +15,7 @@ import zipfile
 REPOSITORY = "MiracleXYZ/AeroTab"
 VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
 TEMPLATE = Path(__file__).with_name("aerotab.rb.template")
+MACOS_SYMBOLS = {"26.0": "tahoe"}
 
 
 def stable_version(release):
@@ -54,11 +55,14 @@ def render_cask(version, directory):
         minimum_versions.add(minimum)
     if len(minimum_versions) != 1:
         raise ValueError("Architectures disagree on minimum macOS version")
+    minimum = minimum_versions.pop()
+    if minimum not in MACOS_SYMBOLS:
+        raise ValueError(f"Add a Homebrew macOS symbol for minimum version {minimum}")
     return Template(TEMPLATE.read_text()).substitute(
         version=version,
         arm64_sha256=checksums[f"AeroTab-{version}-arm64.zip"],
         x86_64_sha256=checksums[f"AeroTab-{version}-x86_64.zip"],
-        minimum_macos=minimum_versions.pop(),
+        minimum_macos=MACOS_SYMBOLS[minimum],
     )
 
 

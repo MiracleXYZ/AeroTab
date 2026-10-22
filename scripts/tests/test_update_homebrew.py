@@ -37,6 +37,7 @@ class HomebrewReleaseTests(unittest.TestCase):
         release = self.release()
         self.assertTrue(sync.update_cask(release, self.root, self.cask))
         self.assertIn('version "0.4.0"', self.cask.read_text())
+        self.assertIn('depends_on macos: ">= :tahoe"', self.cask.read_text())
         self.assertFalse(sync.update_cask(release, self.root, self.cask))
 
     def test_corrupt_archive_preserves_existing_cask(self):
