@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+    <key>CFBundleName</key><string>AeroTab</string>
+    <key>CFBundleDisplayName</key><string>AeroTab</string>
+    <key>CFBundleIdentifier</key><string>dev.miraclexyz.AeroTab</string>
+    <key>CFBundleExecutable</key><string>AeroTab</string>
+    <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleDevelopmentRegion</key><string>en</string>
+    <key>CFBundleLocalizations</key><array><string>en</string><string>zh-Hans</string></array>
+    <key>CFBundleShortVersionString</key><string>0.4.0</string>
+    <key>CFBundleVersion</key><string>12</string>
+    <key>CFBundleIconFile</key><string>AeroTab</string>
+    <key>LSMinimumSystemVersion</key><string>26.0</string>
+    <key>LSUIElement</key><true/>
+    <key>NSHighResolutionCapable</key><true/>
+    <key>NSPrincipalClass</key><string>NSApplication</string>
+    <key>CFBundleURLTypes</key><array><dict>
+        <key>CFBundleURLName</key><string>dev.miraclexyz.AeroTab.show</string>
+        <key>CFBundleURLSchemes</key><array><string>aerotab</string></array>
+    </dict></array>
+</dict></plist>
