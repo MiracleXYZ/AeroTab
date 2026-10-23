@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/aerotab.png" width="128" height="128" alt="AeroTab app icon">
+
 # AeroTab
 
 **See your workspaces. Find your windows. Jump straight in.**
@@ -128,29 +130,48 @@ AeroTab records window positions when a workspace is visible. Unvisited workspac
 
 Previews stay in local memory and are cleared when the switcher closes. Normal use does not save captures to disk. There is no telemetry or application network access.
 
-## Development and maintenance
+## Contributing
 
-Requires **Swift 6** and Command Line Tools or Xcode with the **macOS 26 SDK**. There are no third-party Swift package dependencies.
+### Report a bug or suggest a feature
+
+Search [Issues](https://github.com/MiracleXYZ/AeroTab/issues) for an existing report, or [open a new issue](https://github.com/MiracleXYZ/AeroTab/issues/new). For bugs, include your AeroTab, AeroSpace, and macOS versions, steps to reproduce, and what you expected versus what happened. For feature requests, describe what you want to do and how AeroTab could help.
+
+### Build and run from source
+
+Install **Swift 6** and Command Line Tools or Xcode with the **macOS 26 SDK**. Keep AeroSpace running when trying the app.
 
 ```sh
-python3 -m unittest discover -s scripts/tests
-python3 scripts/check-localizations.py  # Check translation keys and arguments
-./scripts/test.sh          # Run core tests
-./scripts/build.sh         # Build build/AeroTab.app
-./scripts/package.sh       # Package a Release ZIP for the current architecture
+git clone https://github.com/MiracleXYZ/AeroTab.git
+cd AeroTab
+./scripts/build.sh
 ```
 
-`AeroTabCore` handles the CLI, settings, layout, and keyboard routing; `AeroTab` handles the native interface, capture, and global keyboard input. English is the source language. Add matching keys to `Resources/en.lproj/Localizable.strings` and `Resources/zh-Hans.lproj/Localizable.strings`, keeping format arguments intact.
+The app is built at `build/AeroTab.app`. Quit any running copy of AeroTab, then open the local build:
 
-**Visual checks:** run `python3 scripts/audit-preview.py build/AeroTab.app/Contents/MacOS/AeroTab` to render fictional fixtures offscreen and check the test process’s effect on workspaces and focus. Temporary outputs are cleaned automatically; keep `build/` for installable packages. Curated README demos live in `assets/demo/`.
+```sh
+open build/AeroTab.app
+```
 
-**Releases:** update the version and build number in `Resources/Info.plist` and the version badges in both READMEs, commit, then push the matching `vX.Y.Z` tag. The release workflow tests, builds, and packages on Apple Silicon and Intel runners, then creates a **draft GitHub Release** with both ZIPs and SHA-256 checksums. Inspect the assets, write the release notes, and publish from the Releases page. Publishing a stable release triggers the Homebrew workflow, which verifies both ZIPs and updates the [Homebrew tap](https://github.com/MiracleXYZ/homebrew-tap). Drafts and prereleases are excluded. To retry, use **Actions → Homebrew → Run workflow** with a published tag, or leave it blank for the latest stable release.
+Follow the app’s setup guide if permissions are requested. After editing the source, run the build command again and reopen the app.
 
-Sync uses the repository secret `HOMEBREW_TAP_DEPLOY_KEY`, an SSH deploy key with write access only to the tap repository. The cask template is `scripts/aerotab.rb.template`; the sync script is `scripts/update-homebrew.py`.
+Where to find the code:
 
-Builds use ad-hoc signing by default. Set `CODESIGN_IDENTITY` to use a local signing certificate; Developer ID notarization requires separate setup.
+- [`Sources/AeroTabCore/`](Sources/AeroTabCore): AeroSpace commands, settings, layout, and keyboard routing.
+- [`Sources/AeroTab/`](Sources/AeroTab): SwiftUI/AppKit interface, window previews, and global keyboard input.
+- [`Resources/`](Resources): app metadata and English/Chinese translations.
+- [`Tests/AeroTabCoreTests/`](Tests/AeroTabCoreTests): tests for core behavior.
 
-Issues and contributions are welcome. Include your macOS/AeroSpace versions and reproduction steps, and remove private information from screenshots.
+### Submit a pull request
+
+Fork the repository and create a branch for your change. Add or update tests when changing behavior, then run these checks; the script checks require **Python 3**:
+
+```sh
+./scripts/test.sh
+python3 scripts/check-localizations.py
+python3 -m unittest discover -s scripts/tests
+```
+
+[Open a pull request](https://github.com/MiracleXYZ/AeroTab/compare) with a description of the problem, your change, and how you tested it. Link a related issue if there is one, and include a screenshot for interface changes.
 
 ## Inspired by
 

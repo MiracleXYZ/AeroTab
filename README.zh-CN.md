@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/aerotab.png" width="128" height="128" alt="AeroTab 应用图标">
+
 # AeroTab
 
 **看清工作区，找到窗口，直接切换。**
@@ -128,29 +130,48 @@ AeroTab 在工作区可见时记录窗口位置。尚未访问过的工作区显
 
 预览只在本机内存中处理，关闭切换器后清除，不会在正常使用时保存到磁盘。没有遥测或应用网络请求。
 
-## 开发与维护
+## 参与贡献
 
-需要 **Swift 6** 和包含 **macOS 26 SDK** 的 Command Line Tools 或 Xcode。无第三方 Swift 包依赖。
+### 报告问题或提出建议
+
+先在 [Issues](https://github.com/MiracleXYZ/AeroTab/issues) 中搜索是否已有相同问题，也可以 [新建 Issue](https://github.com/MiracleXYZ/AeroTab/issues/new)。报告 Bug 时，请提供 AeroTab、AeroSpace 和 macOS 的版本、复现步骤，以及预期行为和实际结果。提出功能建议时，请描述你想完成什么，以及希望 AeroTab 如何帮助你。
+
+### 从源码构建和运行
+
+安装 **Swift 6**，以及包含 **macOS 26 SDK** 的 Command Line Tools 或 Xcode。试用应用时，请保持 AeroSpace 运行。
 
 ```sh
-python3 -m unittest discover -s scripts/tests
-python3 scripts/check-localizations.py  # 检查翻译 key 与格式参数
-./scripts/test.sh          # 运行核心测试
-./scripts/build.sh         # 构建 build/AeroTab.app
-./scripts/package.sh       # 打包当前架构的 Release ZIP
+git clone https://github.com/MiracleXYZ/AeroTab.git
+cd AeroTab
+./scripts/build.sh
 ```
 
-`AeroTabCore` 负责 CLI、配置、布局和按键路由；`AeroTab` 负责原生界面、窗口捕获与全局键盘处理。英文为源语言；新增文案时同步更新 `Resources/en.lproj/Localizable.strings` 与 `Resources/zh-Hans.lproj/Localizable.strings`，保持 key 和格式参数一致。
+构建产物位于 `build/AeroTab.app`。先退出正在运行的 AeroTab，再打开本地构建的应用：
 
-**界面检查：** 运行 `python3 scripts/audit-preview.py build/AeroTab.app/Contents/MacOS/AeroTab`，使用虚构数据离屏渲染，并检查测试进程是否影响工作区和焦点。临时产物默认自动清理；`build/` 只保留安装包。README 演示图保存在 `assets/demo/`。
+```sh
+open build/AeroTab.app
+```
 
-**发布版本：** 更新 `Resources/Info.plist` 的版本号、构建号及两份 README 的版本徽章，提交后推送对应的 `vX.Y.Z` 标签。Release workflow 会在 Apple Silicon 与 Intel runner 上分别测试、构建并打包，创建带有两个 ZIP 和 SHA-256 校验文件的 **GitHub Release 草稿**。检查产物、填写版本说明后，在 Releases 页面发布。正式版发布后，Homebrew workflow 会校验两个 ZIP 并自动更新 [Homebrew tap](https://github.com/MiracleXYZ/homebrew-tap)；草稿和预发布版不会同步。需要重试时，可在 Actions → Homebrew → Run workflow 中指定已发布标签，留空则使用最新正式版。
+如需授权，按应用内的引导操作。修改源码后，重新执行构建命令并打开应用即可。
 
-自动同步使用仓库 Secret `HOMEBREW_TAP_DEPLOY_KEY`，对应仅能写入 tap 仓库的 SSH deploy key。Cask 模板在 `scripts/aerotab.rb.template`；同步脚本为 `scripts/update-homebrew.py`。
+代码位置：
 
-默认构建使用 ad-hoc 签名。如需使用本机证书，可设置 `CODESIGN_IDENTITY` 环境变量；Developer ID 公证需另行配置。
+- [`Sources/AeroTabCore/`](Sources/AeroTabCore)：AeroSpace 命令、设置、布局与按键路由。
+- [`Sources/AeroTab/`](Sources/AeroTab)：SwiftUI/AppKit 界面、窗口预览与全局键盘处理。
+- [`Resources/`](Resources)：应用元数据与中英文翻译。
+- [`Tests/AeroTabCoreTests/`](Tests/AeroTabCoreTests)：核心行为测试。
 
-欢迎提交问题与改进。问题报告请附 macOS / AeroSpace 版本和复现步骤，截图中请移除私人信息。
+### 提交 Pull Request
+
+Fork 仓库，为改动创建分支。修改行为时，补充或更新相关测试，然后运行以下检查；其中的脚本检查需要 **Python 3**：
+
+```sh
+./scripts/test.sh
+python3 scripts/check-localizations.py
+python3 -m unittest discover -s scripts/tests
+```
+
+[发起 Pull Request](https://github.com/MiracleXYZ/AeroTab/compare)，说明解决了什么问题、做了哪些修改、如何验证。如有相关 Issue，请附上链接；界面改动请附上截图。
 
 ## 灵感来源
 
