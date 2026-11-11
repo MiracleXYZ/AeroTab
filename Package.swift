@@ -8,6 +8,7 @@ let package = Package(
     targets: [
         .target(name: "AeroTabCore"),
         .executableTarget(name: "AeroTab", dependencies: ["AeroTabCore"]),
-        .testTarget(name: "AeroTabCoreTests", dependencies: ["AeroTabCore"])
+        .testTarget(name: "AeroTabCoreTests", dependencies: ["AeroTabCore"]),
+        .testTarget(name: "AeroTabTests", dependencies: ["AeroTab", "AeroTabCore"])
     ]
 )

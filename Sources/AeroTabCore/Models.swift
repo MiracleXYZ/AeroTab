@@ -112,8 +112,10 @@ public struct Snapshot: Equatable, Sendable {
         }
         let tiled = ordered.filter { !$0.isFloating && placements[$0.id] != nil }
         let unplaced = ordered.filter { !$0.isFloating && placements[$0.id] == nil }
-        let rootAxis = workspaces.first { $0.name == workspace }?.rootAxis
-        return SpatialWindowOrder.tiled(tiled, placements: placements, preferredAxis: rootAxis) + unplaced + ordered.filter(\.isFloating)
+        let workspaceInfo = workspaces.first { $0.name == workspace }
+        let inferred = unplaced.isEmpty ? InferredWindowLayout.infer(tiled, placements: placements, root: workspaceInfo?.rootLayoutKind) : nil
+        return (inferred?.windows ?? SpatialWindowOrder.tiled(tiled, placements: placements, preferredAxis: workspaceInfo?.rootAxis))
+            + unplaced + ordered.filter(\.isFloating)
     }
 
     public func apps(in workspace: String, layout: WorkspaceGeometry? = nil) -> [WorkspaceApp] {

@@ -88,6 +88,7 @@ enum PreviewRenderer {
         model.snapshot.windows = originalWindows
         model.settings.configuration.appShortcuts = AppShortcut.bottomRow
         try renderRepeatedWindows(to: url)
+        try renderAccordion(to: url)
         model.snapshot.workspaces.append(Workspace(name: "B", monitorID: 1))
         try write(SwitcherView(model: model, monitorID: nil, metrics: metrics, useSolidBackground: true),
                   size: CGSize(width: metrics.width, height: metrics.height),
@@ -259,6 +260,54 @@ enum PreviewRenderer {
             try write(SwitcherView(model: model, monitorID: nil, metrics: metrics, useSolidBackground: true),
                       size: CGSize(width: metrics.width, height: metrics.height),
                       to: url.deletingPathExtension().appendingPathExtension("repeated-windows-\(dark ? "dark" : "light").png"), dark: dark)
+        }
+    }
+
+    private static func renderAccordion(to url: URL) throws {
+        let model = fixtureModel()
+        model.snapshot.workspaces = [Workspace(name: "1", monitorID: 1, rootLayoutKind: "h_tiles"),
+                                     Workspace(name: "2", monitorID: 1, rootLayoutKind: "v_tiles"),
+                                     Workspace(name: "3", monitorID: 1, rootLayoutKind: "h_accordion"),
+                                     Workspace(name: "4", monitorID: 1, rootLayoutKind: "v_accordion")]
+        model.snapshot.windows = []
+        for (index, name) in ["1", "2", "3", "4"].enumerated() {
+            let horizontal = index.isMultiple(of: 2)
+            let rootKind = model.snapshot.workspaces[index].rootLayoutKind!
+            let childKind = index == 2 ? "v_tiles" : horizontal ? "v_accordion" : "h_accordion"
+            let base = index * 4
+            for (offset, app) in [("Finder", "com.apple.finder"), ("Finder", "com.apple.finder"),
+                                  ("Terminal", "com.apple.Terminal"), ("Notes", "com.apple.Notes")].enumerated() {
+                let kind = offset == 3 ? "floating" : offset < 2 ? childKind : rootKind
+                let window = WorkspaceWindow(id: base + offset + 1, appName: app.0, bundleID: app.1, workspace: name,
+                                             title: ["A · Folder", "B · Folder", "C · Terminal", "D · Floating"][offset], layoutKind: kind)
+                model.snapshot.windows.append(window)
+                let renderer = ImageRenderer(content: FixtureWindow(title: window.title, code: offset == 2)
+                    .frame(width: 480, height: 360))
+                model.previews.images[window.id] = renderer.cgImage
+            }
+            let frames: [CGRect] = index == 2 ? [
+                CGRect(x: 0, y: 0, width: 0.94, height: 0.48), CGRect(x: 0, y: 0.52, width: 0.94, height: 0.48),
+                CGRect(x: 0.06, y: 0, width: 0.94, height: 1), CGRect(x: 0.55, y: 0.6, width: 0.4, height: 0.35)
+            ] : index == 3 ? [
+                CGRect(x: 0, y: 0, width: 0.94, height: 0.94), CGRect(x: 0.06, y: 0, width: 0.94, height: 0.94),
+                CGRect(x: 0, y: 0.06, width: 1, height: 0.94), CGRect(x: 0.55, y: 0.6, width: 0.4, height: 0.35)
+            ] : horizontal ? [
+                CGRect(x: 0, y: 0, width: 0.48, height: 0.94), CGRect(x: 0, y: 0.06, width: 0.48, height: 0.94),
+                CGRect(x: 0.52, y: 0, width: 0.48, height: 1), CGRect(x: 0.55, y: 0.6, width: 0.4, height: 0.35)
+            ] : [
+                CGRect(x: 0, y: 0, width: 0.94, height: 0.48), CGRect(x: 0.06, y: 0, width: 0.94, height: 0.48),
+                CGRect(x: 0, y: 0.52, width: 1, height: 0.48), CGRect(x: 0.55, y: 0.6, width: 0.4, height: 0.35)
+            ]
+            model.previews.layouts[name] = WorkspaceGeometry(placements: frames.enumerated().map {
+                WindowPlacement(id: base + $0.offset + 1, rect: $0.element, zOrder: $0.offset)
+            })
+        }
+        model.selection.begin(workspaces: model.workspaces, focused: "1", order: .workspace, advance: 0)
+        let metrics = SwitcherMetrics(count: 4, availableWidth: 1400, availableHeight: 900)
+        for dark in [true, false] {
+            try write(SwitcherView(model: model, monitorID: nil, metrics: metrics, useSolidBackground: true),
+                      size: CGSize(width: metrics.width, height: metrics.height),
+                      to: url.deletingPathExtension().appendingPathExtension("accordion-\(dark ? "dark" : "light").png"), dark: dark)
         }
     }
 

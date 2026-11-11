@@ -11,7 +11,7 @@
 [English](README.md) · 简体中文
 
 ![macOS 26+](https://img.shields.io/badge/macOS-26%2B-222222?logo=apple)
-![Version 0.4.0](https://img.shields.io/badge/version-0.4.0-blue)
+![Version 0.4.1](https://img.shields.io/badge/version-0.4.1-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 </div>

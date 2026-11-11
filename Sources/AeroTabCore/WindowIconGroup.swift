@@ -35,11 +35,18 @@ extension Snapshot {
         guard let axis, known.count == tiled.count, known.count > 1 else {
             return WorkspaceIconLayout(rootAxis: axis, groups: singles)
         }
+        if InferredWindowLayout.supports(tiled, root: workspaceInfo?.rootLayoutKind) {
+            guard let inferred = InferredWindowLayout.infer(tiled, placements: placements, root: workspaceInfo?.rootLayoutKind) else {
+                return WorkspaceIconLayout(rootAxis: axis, groups: singles)
+            }
+            let groups = inferred.children.map {
+                WindowIconGroup(windows: $0.windows, subgroupAxis: LayoutAxis(layoutKind: $0.kind))
+            } + ordered.filter(\.isFloating).map { WindowIconGroup(windows: [$0]) }
+            return WorkspaceIconLayout(rootAxis: axis, groups: groups)
+        }
         let children = SpatialWindowOrder.partitions(tiled, placements: placements, axis: axis)
         guard children.count > 1 else { return WorkspaceIconLayout(rootAxis: axis, groups: singles) }
         let groups = children.flatMap { child -> [WindowIconGroup] in
-            // A line denotes a child group, not a direction. Its first internal split is
-            // perpendicular to the outer split; overlapping/accordion windows stay ungrouped.
             let internalGroups = SpatialWindowOrder.partitions(child, placements: placements, axis: axis.opposite)
             if child.count > 1 && internalGroups.count > 1 {
                 return [WindowIconGroup(windows: child, subgroupAxis: axis.opposite)]

@@ -45,25 +45,6 @@ extension WorkspaceStyle {
     }
 }
 
-@MainActor
-final class AppIconCache {
-    static let shared = AppIconCache()
-    private var icons: [String: NSImage] = [:]
-    func icon(for app: WorkspaceApp) -> NSImage {
-        if let cached = icons[app.id] { return cached }
-        let icon: NSImage
-        if let running = NSRunningApplication(processIdentifier: app.pid), let image = running.icon {
-            icon = image
-        } else if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: app.bundleID) {
-            icon = NSWorkspace.shared.icon(forFile: url.path)
-        } else {
-            icon = NSImage(systemSymbolName: "app.dashed", accessibilityDescription: app.name)!
-        }
-        icons[app.id] = icon
-        return icon
-    }
-}
-
 struct Keycap: View {
     let text: String
     var body: some View {

@@ -83,6 +83,7 @@ final class AppModel {
     func show(advance: Int = 0, followsOptionRelease: Bool = false) {
         guard !isSwitching else { return }
         if invocation.isActive { cycle(advance == 0 ? 1 : advance); return }
+        AppIconCache.shared.beginPresentation()
         lastError = nil
         let generation = invocation.begin(advance: advance, followsOptionRelease: followsOptionRelease)
         loadTask = Task { [weak self] in
